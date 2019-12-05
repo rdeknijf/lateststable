@@ -45,7 +45,7 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._normalize_version_string(r.json().get('tag_name'), clean)
+            return self._normalize_version_string(sorted_releases[-1], clean)
 
         logger.debug(f'Something went wrong retrieving {package} from docker hub: '
                      f'Code {r.status_code}')
@@ -131,7 +131,9 @@ class LatestStable:
 
         # try version template
 
-        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles=Template:Latest_stable_software_release/{package}&rvslots=main&rvsection=0'
+        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&' \
+              f'format=json&titles=Template:Latest_stable_software_release/{package}&' \
+              f'rvslots=main&rvsection=0'
 
         r = requests.get(url)
 
@@ -147,7 +149,8 @@ class LatestStable:
 
         # try normal
 
-        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles={package}&rvslots=main&rvsection=0'
+        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&' \
+              f'format=json&titles={package}&rvslots=main&rvsection=0'
 
         r = requests.get(url)
 
@@ -161,11 +164,12 @@ class LatestStable:
             if reg:
                 return self._normalize_version_string(reg.group(1), clean)
 
-
-
         # try with "_software"
 
-        # url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles={package}_(software)&rvsection=0'
+        # url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&
+        # format=json&titles={package}_(software)&rvsection=0'
+
+        return None
 
     @staticmethod
     def _normalize_version_string(version_string: Optional[str], clean: bool) -> Optional[str]:
