@@ -33,7 +33,7 @@ class LatestStable:
 
         return sorted(out, key=LooseVersion)
 
-    def pypi(self, package: str, clean=True) -> Optional[str]:
+    async def pypi(self, package: str, clean=True) -> Optional[str]:
         url = f"https://pypi.python.org/pypi/{package}/json"
 
         r = requests.get(url)
@@ -52,7 +52,7 @@ class LatestStable:
 
         return None
 
-    def github(self, package: str, clean=True) -> Optional[str]:
+    async def github(self, package: str, clean=True) -> Optional[str]:
 
         # check /latest
 
@@ -101,7 +101,7 @@ class LatestStable:
 
         return None
 
-    def docker(self, package: str, clean: bool = True) -> Optional[str]:
+    async def docker(self, package: str, clean: bool = True) -> Optional[str]:
 
         url = f'https://registry.hub.docker.com/v1/repositories/{package}/tags'
 
@@ -127,7 +127,7 @@ class LatestStable:
                      f'Code {r.status_code}')
         return None
 
-    def wikipedia(self, package: str, clean: bool = True) -> Optional[str]:
+    async def wikipedia(self, package: str, clean: bool = True) -> Optional[str]:
 
         # try version template
 
@@ -188,3 +188,5 @@ class LatestStable:
         }
 
         return ret
+
+lst = LatestStable()

@@ -9,7 +9,8 @@ flake8 = "*"
 
 [packages]
 requests = "*"
-flask-api = "*"
+fastapi = "*"
+uvicorn = "*"
 
 [requires]
 python_version = "3.8"
