@@ -1,10 +1,12 @@
+import logging
 import re
 import sys
-from typing import List, Optional
 from distutils.version import LooseVersion
-import logging
+from typing import Any, List, Optional
 
 import requests
+from packaging.version import Version, parse
+from pydantic.main import BaseModel
 
 loglevel = logging.INFO
 
@@ -18,8 +20,15 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-class LatestStable:
+class Result(BaseModel):
+    version: str
+    platform_version_string: str
+    major: str
+    minor: str
+    patch: str
 
+
+class LatestStable:
     re_version = re.compile(r"^v?(\d+\.)?(\d+\.)?(\*|\d+)$")
     re_latest_release_version = re.compile(r"latest release version = (v?(\d+\.)?(\d+\.)?(\*|\d+))")
 
@@ -33,7 +42,7 @@ class LatestStable:
 
         return sorted(out, key=LooseVersion)
 
-    async def pypi(self, package: str, clean=True) -> Optional[str]:
+    def pypi(self, package: Any, clean: bool = True) -> Optional[Result]:
         url = f"https://pypi.python.org/pypi/{package}/json"
 
         r = requests.get(url)
@@ -45,14 +54,13 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._normalize_version_string(sorted_releases[-1], clean)
+            return self._prep_output(sorted_releases[-1], clean)
 
-        logger.debug(f'Something went wrong retrieving {package} from docker hub: '
-                     f'Code {r.status_code}')
+        logger.debug(f'Something went wrong retrieving {package} from pypi: ' f'Code {r.status_code}')
 
         return None
 
-    async def github(self, package: str, clean=True) -> Optional[str]:
+    def github(self, package: str, clean=True) -> Optional[Result]:
 
         # check /latest
 
@@ -62,7 +70,7 @@ class LatestStable:
         r = requests.get(url)
 
         if r.ok:
-            return self._normalize_version_string(r.json().get('tag_name'), clean)
+            return self._prep_output(r.json().get('tag_name'), clean)
 
         # check /releases
 
@@ -79,7 +87,7 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
             if len(sorted_releases):
-                return self._normalize_version_string(sorted_releases[-1], clean)
+                return self._prep_output(sorted_releases[-1], clean)
 
         # check /tags
 
@@ -95,13 +103,13 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_tags}')
 
             if len(sorted_tags):
-                return self._normalize_version_string(sorted_tags[-1], clean)
+                return self._prep_output(sorted_tags[-1], clean)
 
         logger.debug(f'Something went wrong retrieving {package} from github: Code {r.status_code}')
 
         return None
 
-    async def docker(self, package: str, clean: bool = True) -> Optional[str]:
+    def docker(self, package: str, clean: bool = True) -> Optional[Result]:
 
         url = f'https://registry.hub.docker.com/v1/repositories/{package}/tags'
 
@@ -121,13 +129,12 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._normalize_version_string(sorted_releases[-1], clean)
+            return self._prep_output(sorted_releases[-1], clean)
 
-        logger.debug(f'Something went wrong retrieving {package} from docker hub: '
-                     f'Code {r.status_code}')
+        logger.debug(f'Something went wrong retrieving {package} from docker hub: ' f'Code {r.status_code}')
         return None
 
-    async def wikipedia(self, package: str, clean: bool = True) -> Optional[str]:
+    def wikipedia(self, package: str, clean: bool = True) -> Optional[Result]:
 
         # try version template
 
@@ -139,13 +146,13 @@ class LatestStable:
 
         if r.ok:
 
-            text = r.json()['query']['pages'][list(r.json()['query']['pages'])[0]]['revisions'][0][
-                'slots']['main'].get('*')
+            text = r.json()['query']['pages'][list(
+                r.json()['query']['pages'])[0]]['revisions'][0]['slots']['main'].get('*')
 
             reg = self.re_latest_release_version.search(text)
 
             if reg:
-                return self._normalize_version_string(reg.group(1), clean)
+                return self._prep_output(reg.group(1), clean)
 
         # try normal
 
@@ -156,13 +163,13 @@ class LatestStable:
 
         if r.ok:
 
-            text = r.json()['query']['pages'][list(r.json()['query']['pages'])[0]]['revisions'][0][
-                'slots']['main'].get('*')
+            text = r.json()['query']['pages'][list(
+                r.json()['query']['pages'])[0]]['revisions'][0]['slots']['main'].get('*')
 
             reg = self.re_latest_release_version.search(text)
 
             if reg:
-                return self._normalize_version_string(reg.group(1), clean)
+                return self._prep_output(reg.group(1), clean)
 
         # try with "_software"
 
@@ -171,13 +178,81 @@ class LatestStable:
 
         return None
 
+    def jetbrains(self, package: str, clean: bool = True) -> Optional[Result]:
+
+        # this would be a list of all releases
+        # url = 'https://data.services.jetbrains.com/products/releases?code=IIU&type=release'
+
+        product_map = {
+            'resharper': 'RS',
+            'appcode': 'AC',
+            'phpstorm': 'PS',
+            'datagrip': 'DG',
+            'idea': 'IIC',
+            'intellij': 'IIC',
+            'intellij-idea': 'IIC',
+            'idea-community': 'IIC',
+            'ideaIU': 'IIU',
+            'idea-ultimate': 'IIU',
+            'intellij-ultimate': 'IIU',
+            'intellij-idea-ultimate': 'IIU',
+            'intellij-idea-edu': 'IIE',
+            'idea-edu': 'IIE',
+            'intellij-edu': 'IIE',
+            'goland': 'GO',
+            'youtrack': 'YTD',
+            'clion': 'CL',
+            'dotmemory': 'DM',
+            'dotpeek': 'DP',
+            'teamcity': 'TC',
+            'resharperultimate': 'RC',
+            'mps': 'MPS',
+            'toolbox app': 'TBA',
+            'rider': 'RD',
+            'pycharm-edu': 'PCE',
+            'pycharm': 'PCC',
+            'pycharm-community': 'PCC',
+            'hub': 'HB',
+            'rubymine': 'RM',
+            'pycharm-professional': 'PCP',
+            'webstorm': 'WS',
+            'dpk': 'DPK',
+            'upsource': 'US',
+            'dotcover': 'DC',
+        }
+
+        # map the input to the product code, if none extists, just use the code itself
+        code = product_map[package] if package in product_map else package
+
+        code_str = '%2C'.join(set(product_map.values()))
+
+        url = f'https://data.services.jetbrains.com/products/releases?code={code_str}&latest=true&type=release'
+
+        r = requests.get(url)
+
+        if r.ok:
+            version = r.json()[code][0]['version']
+
+            return self._prep_output(version, clean)
+
+        return None
+
     @staticmethod
-    def _normalize_version_string(version_string: Optional[str], clean: bool) -> Optional[str]:
+    def _prep_output(version_string: Optional[str], clean: bool) -> Optional[Result]:
 
-        if version_string is not None and clean:
-            return version_string.lstrip('v')
+        if not version_string:
+            return None
 
-        return version_string
+        version = parse(version_string)
+
+        if not isinstance(version, Version):
+            return None
+
+        return Result(version=version_string.lstrip('v'),
+                      platform_version_string=version_string,
+                      major=str(version.major),
+                      minor=str(version.minor),
+                      patch=str(version.micro))
 
     def anywhere(self, package, clean=True):
 
@@ -188,5 +263,6 @@ class LatestStable:
         }
 
         return ret
+
 
 lst = LatestStable()
