@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "pytest*"
+      - dependency-name: "isort"
+      - dependency-name: "flake8"
+      - dependency-name: "mypy"
+      - dependency-name: "yapf"
+      - dependency-name: "pep8-naming"
+      - dependency-name: "tox*"

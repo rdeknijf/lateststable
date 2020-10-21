@@ -1,2 +1,6 @@
 .*
 requirements.txt
+!/.github/
+!/.style.yapf
+!/.editorconfig
+!/.dockerignore
