@@ -23,6 +23,8 @@ jobs:
         with:
           push: true
           tags: eu.gcr.io/lateststable/lateststable:latest
+          cache-from: type=registry,ref=eu.gcr.io/lateststable/lateststable:latest
+          cache-to: type=inline
       - name: Deploy service to Cloud Run
         uses: stefda/action-cloud-run@v1.0
         with:
@@ -30,4 +32,4 @@ jobs:
           service: lateststable
           project: lateststable
           region: europe-west4
-          service_key: ${{ secrets.GOOGLE_SA_KEY }}
+          service key: ${{ secrets.GOOGLE_SA_KEY }}
