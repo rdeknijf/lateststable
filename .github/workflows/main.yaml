@@ -25,11 +25,17 @@ jobs:
           tags: eu.gcr.io/lateststable/lateststable:latest
           cache-from: type=registry,ref=eu.gcr.io/lateststable/lateststable:latest
           cache-to: type=inline
-      - name: Deploy service to Cloud Run
-        uses: stefda/action-cloud-run@v1.0
+      - name: Setup gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          image: eu.gcr.io/lateststable/lateststable:latest
-          service: lateststable
-          project: lateststable
-          region: europe-west4
-          service key: ${{ secrets.GOOGLE_SA_KEY }}
+          service_account_key: ${{ secrets.GOOGLE_SA_KEY }}
+          project_id: lateststable
+          export_default_credentials: true
+      - name: Deploy
+        run: |-
+          gcloud run deploy lateststable \
+            --quiet \
+            --region=europe-west4 \
+            --image=eu.gcr.io/lateststable/lateststable:latest \
+            --platform=managed \
+            --allow-unauthenticated
