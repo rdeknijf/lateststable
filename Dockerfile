@@ -17,7 +17,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 ADD src/ /app/
 
-CMD uvicorn main:app --host 0.0.0.0 --port 8000
+CMD uvicorn main:app --host 0.0.0.0 --port 8080
 
 
 #ENTRYPOINT ["python", "/app/main.py"]
