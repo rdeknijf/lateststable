@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Response, status
 
-from lst import lst
+from lst import lst, Result
 
 router = APIRouter()
 
 
-@router.get('/pypi/{package}')
+@router.get('/pypi/{package}', response_model=Result)
 async def get_pypi(package: str, response: Response):
 
     ret = lst.pypi(package)
@@ -14,7 +14,7 @@ async def get_pypi(package: str, response: Response):
     return ret
 
 
-@router.get('/jetbrains/{package}')
+@router.get('/jetbrains/{package}', response_model=Result)
 async def get_jetbrains(package: str, response: Response):
 
     ret = lst.jetbrains(package)
@@ -23,16 +23,16 @@ async def get_jetbrains(package: str, response: Response):
     return ret
 
 
-@router.get('/docker/{user}/{image}')
+@router.get('/docker/{user}/{image}', response_model=Result)
 async def get_docker(user: str, image: str):
     return lst.docker(f'{user}/{image}')
 
 
-@router.get('/github/{user}/{repo}')
+@router.get('/github/{user}/{repo}', response_model=Result)
 async def get_github(user: str, repo: str):
     return lst.github(f'{user}/{repo}')
 
 
-@router.get('/wikipedia/{package}')
+@router.get('/wikipedia/{package}', response_model=Result)
 async def get_wikipedia(package: str):
     return await lst.wikipedia(package)
