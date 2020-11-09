@@ -5,7 +5,7 @@ from distutils.version import LooseVersion
 from typing import Any, List, Optional
 
 import requests
-from packaging.version import Version, parse
+from packaging.version import parse, Version
 from pydantic.main import BaseModel
 
 loglevel = logging.INFO
@@ -43,7 +43,8 @@ class Result(BaseModel):
 
 class LatestStable:
     re_version = re.compile(r"^v?(\d+\.)?(\d+\.)?(\*|\d+)$")
-    re_latest_release_version = re.compile(r"latest release version = (v?(\d+\.)?(\d+\.)?(\*|\d+))")
+    re_version_free = re.compile(r"(v?(?:\d+\.)(?:\d+\.)(?:\*|\d+)[.\w]*)")
+    re_latest_release_version = re.compile(r"latest_release_version = (v?(\d+\.)?(\d+\.)?(\*|\d+))")
     re_extract_version_string = re.compile(r"(?:(\d+\.[.\d]*\d+))")
 
     def sort_and_normalize_versions(self, releases: List[str]):
@@ -150,47 +151,37 @@ class LatestStable:
 
     def wikipedia(self, package: str, clean: bool = True) -> Optional[Result]:
 
-        # try version template
+        def fetch(url):
 
-        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&' \
-              f'format=json&titles=Template:Latest_stable_software_release/{package}&' \
-              f'rvslots=main&rvsection=0'
+            r = requests.get(url)
 
-        r = requests.get(url)
+            if r.ok:
+                try:
 
-        if r.ok:
+                    text = r.json()['query']['pages'][list(r.json()['query']['pages'])[0]]['revisions'][0]['slots'][
+                        'main'].get('*')
+                except KeyError:
+                    return None
 
-            text = r.json()['query']['pages'][list(
-                r.json()['query']['pages'])[0]]['revisions'][0]['slots']['main'].get('*')
+                reg = self.re_version_free.search(text)
 
-            reg = self.re_latest_release_version.search(text)
+                if reg:
+                    version = reg.group(1)
 
-            if reg:
-                return self._prep_output(package, reg.group(1), clean)
+                    if version:
+                        return version
 
-        # try normal
+                return None
 
-        url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&' \
-              f'format=json&titles={package}&rvslots=main&rvsection=0'
+        baseurl = 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json' \
+                  '&rvslots=main&rvsection=0'
 
-        r = requests.get(url)
+        version = fetch(f'{baseurl}&titles=Template:Latest_stable_software_release/{package}')
 
-        if r.ok:
+        if not version:
+            version = fetch(f'{baseurl}&titles={package}')
 
-            text = r.json()['query']['pages'][list(
-                r.json()['query']['pages'])[0]]['revisions'][0]['slots']['main'].get('*')
-
-            reg = self.re_latest_release_version.search(text)
-
-            if reg:
-                return self._prep_output(package, reg.group(1), clean)
-
-        # try with "_software"
-
-        # url = f'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&
-        # format=json&titles={package}_(software)&rvsection=0'
-
-        return None
+        return self._prep_output(package, version, clean)
 
     def jetbrains(self, package: str, clean: bool = True) -> Optional[Result]:
 
@@ -259,7 +250,6 @@ class LatestStable:
         version = parse(version_string)
 
         if not isinstance(version, Version):
-
             reg = self.re_extract_version_string.search(version_string)
 
             version = parse(reg.group(1))
