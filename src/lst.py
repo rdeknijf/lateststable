@@ -21,16 +21,30 @@ logger.addHandler(handler)
 
 
 class Result(BaseModel):
-    version: str
+    name: str
+    version: Optional[str]
     platform_version_string: str
-    major: str
-    minor: str
-    patch: str
+    major: Optional[str]
+    minor: Optional[str]
+    patch: Optional[str]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "somepackage",
+                "version": "3.2.1",
+                "platform_version_string": "3.2.1",
+                "major": "32",
+                "minor": "2",
+                "patch": "1",
+            }
+        }
 
 
 class LatestStable:
     re_version = re.compile(r"^v?(\d+\.)?(\d+\.)?(\*|\d+)$")
     re_latest_release_version = re.compile(r"latest release version = (v?(\d+\.)?(\d+\.)?(\*|\d+))")
+    re_extract_version_string = re.compile(r"(?:(\d+\.[.\d]*\d+))")
 
     def sort_and_normalize_versions(self, releases: List[str]):
 
@@ -54,9 +68,9 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._prep_output(sorted_releases[-1], clean)
+            return self._prep_output(package, sorted_releases[-1], clean)
 
-        logger.debug(f'Something went wrong retrieving {package} from pypi: ' f'Code {r.status_code}')
+        logger.debug(f'Something went wrong retrieving {package} from pypi: Code {r.status_code}')
 
         return None
 
@@ -70,7 +84,7 @@ class LatestStable:
         r = requests.get(url)
 
         if r.ok:
-            return self._prep_output(r.json().get('tag_name'), clean)
+            return self._prep_output(package, r.json().get('tag_name'), clean)
 
         # check /releases
 
@@ -87,7 +101,7 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
             if len(sorted_releases):
-                return self._prep_output(sorted_releases[-1], clean)
+                return self._prep_output(package, sorted_releases[-1], clean)
 
         # check /tags
 
@@ -103,7 +117,7 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_tags}')
 
             if len(sorted_tags):
-                return self._prep_output(sorted_tags[-1], clean)
+                return self._prep_output(package, sorted_tags[-1], clean)
 
         logger.debug(f'Something went wrong retrieving {package} from github: Code {r.status_code}')
 
@@ -129,9 +143,9 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._prep_output(sorted_releases[-1], clean)
+            return self._prep_output(package, sorted_releases[-1], clean)
 
-        logger.debug(f'Something went wrong retrieving {package} from docker hub: ' f'Code {r.status_code}')
+        logger.debug(f'Something went wrong retrieving {package} from docker hub: Code {r.status_code}')
         return None
 
     def wikipedia(self, package: str, clean: bool = True) -> Optional[Result]:
@@ -152,7 +166,7 @@ class LatestStable:
             reg = self.re_latest_release_version.search(text)
 
             if reg:
-                return self._prep_output(reg.group(1), clean)
+                return self._prep_output(package, reg.group(1), clean)
 
         # try normal
 
@@ -169,7 +183,7 @@ class LatestStable:
             reg = self.re_latest_release_version.search(text)
 
             if reg:
-                return self._prep_output(reg.group(1), clean)
+                return self._prep_output(package, reg.group(1), clean)
 
         # try with "_software"
 
@@ -233,12 +247,11 @@ class LatestStable:
         if r.ok:
             version = r.json()[code][0]['version']
 
-            return self._prep_output(version, clean)
+            return self._prep_output(package, version, clean)
 
         return None
 
-    @staticmethod
-    def _prep_output(version_string: Optional[str], clean: bool) -> Optional[Result]:
+    def _prep_output(self, name: str, version_string: Optional[str], clean: bool) -> Optional[Result]:
 
         if not version_string:
             return None
@@ -246,9 +259,16 @@ class LatestStable:
         version = parse(version_string)
 
         if not isinstance(version, Version):
+
+            reg = self.re_extract_version_string.search(version_string)
+
+            version = parse(reg.group(1))
+
+        if not isinstance(version, Version):
             return None
 
-        return Result(version=version_string.lstrip('v'),
+        return Result(name=name,
+                      version=str(version),
                       platform_version_string=version_string,
                       major=str(version.major),
                       minor=str(version.minor),
