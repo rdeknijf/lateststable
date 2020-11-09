@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title>LatestStable API</title>
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
+</head>
+<body>
+<main role="main" class="container">
+  <div class="row">
+    <div>
+      <h1>Fetch the latest stable version of anything</h1>
+      <p>This is a free JSON REST API service to figure out what the latest stable version of
+        something is.</p>
+      <div class="card">
+        <div class="card-body"><h2>Try it!</h2>
+          <code><a href="https://lateststable.org/v1/pypi/requests">https://lateststable.org/v1/pypi/requests</a></code>
+        </div>
+      </div>
+      <p>There's currently four endpoints:
+        <ul>
+          <li>Pypi</li>
+          <li>Github</li>
+          <li>Docker</li>
+          <li>Wikipedia</li>
+        </ul></p>
+      <p>The result will always be in this format:</p>
+      <pre><code>
+{
+  "version": "3.2.1",
+  "platform_version_string": "3.2.1",
+  "major": "32",
+  "minor": "2",
+  "patch": "1"
+}</code></pre>
+    </div>
+  </div>
+
+</main>
+<footer class="footer">
+  <div class="container">
+    <a href="/docs">Docs</a> - <a href="/redoc">Redoc</a> - <a href="/openapi.json">openapi.json</a>
+  </div>
+</footer>
+</body>
+</html>
