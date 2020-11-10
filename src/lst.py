@@ -57,7 +57,7 @@ class LatestStable:
 
         return sorted(out, key=LooseVersion)
 
-    def pypi(self, package: Any, clean: bool = True) -> Optional[Result]:
+    def pypi(self, package: Any) -> Optional[Result]:
         url = f"https://pypi.python.org/pypi/{package}/json"
 
         r = requests.get(url)
@@ -69,13 +69,13 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._prep_output(package, sorted_releases[-1], clean)
+            return self._prep_output(package, sorted_releases[-1])
 
         logger.debug(f'Something went wrong retrieving {package} from pypi: Code {r.status_code}')
 
         return None
 
-    def github(self, package: str, clean=True) -> Optional[Result]:
+    def github(self, package: str) -> Optional[Result]:
 
         # check /latest
 
@@ -85,7 +85,7 @@ class LatestStable:
         r = requests.get(url)
 
         if r.ok:
-            return self._prep_output(package, r.json().get('tag_name'), clean)
+            return self._prep_output(package, r.json().get('tag_name'))
 
         # check /releases
 
@@ -102,7 +102,7 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
             if len(sorted_releases):
-                return self._prep_output(package, sorted_releases[-1], clean)
+                return self._prep_output(package, sorted_releases[-1])
 
         # check /tags
 
@@ -118,13 +118,13 @@ class LatestStable:
             logger.debug(f'releases found for {package}: {sorted_tags}')
 
             if len(sorted_tags):
-                return self._prep_output(package, sorted_tags[-1], clean)
+                return self._prep_output(package, sorted_tags[-1])
 
         logger.debug(f'Something went wrong retrieving {package} from github: Code {r.status_code}')
 
         return None
 
-    def docker(self, package: str, clean: bool = True) -> Optional[Result]:
+    def docker(self, package: str) -> Optional[Result]:
 
         url = f'https://registry.hub.docker.com/v1/repositories/{package}/tags'
 
@@ -144,12 +144,12 @@ class LatestStable:
 
             logger.debug(f'releases found for {package}: {sorted_releases}')
 
-            return self._prep_output(package, sorted_releases[-1], clean)
+            return self._prep_output(package, sorted_releases[-1])
 
         logger.debug(f'Something went wrong retrieving {package} from docker hub: Code {r.status_code}')
         return None
 
-    def wikipedia(self, package: str, clean: bool = True) -> Optional[Result]:
+    def wikipedia(self, package: str) -> Optional[Result]:
 
         def fetch(url):
 
@@ -181,9 +181,9 @@ class LatestStable:
         if not version:
             version = fetch(f'{baseurl}&titles={package}')
 
-        return self._prep_output(package, version, clean)
+        return self._prep_output(package, version)
 
-    def jetbrains(self, package: str, clean: bool = True) -> Optional[Result]:
+    def jetbrains(self, package: str) -> Optional[Result]:
 
         # this would be a list of all releases
         # url = 'https://data.services.jetbrains.com/products/releases?code=IIU&type=release'
@@ -238,11 +238,11 @@ class LatestStable:
         if r.ok:
             version = r.json()[code][0]['version']
 
-            return self._prep_output(package, version, clean)
+            return self._prep_output(package, version)
 
         return None
 
-    def _prep_output(self, name: str, version_string: Optional[str], clean: bool) -> Optional[Result]:
+    def _prep_output(self, name: str, version_string: Optional[str]) -> Optional[Result]:
 
         if not version_string:
             return None
@@ -263,16 +263,6 @@ class LatestStable:
                       major=str(version.major),
                       minor=str(version.minor),
                       patch=str(version.micro))
-
-    def anywhere(self, package, clean=True):
-
-        ret = {
-            'pypi': self.pypi(package, clean=clean),
-            'github': self.pypi(package, clean=clean),
-            'docker': self.docker(package, clean=clean)
-        }
-
-        return ret
 
 
 lst = LatestStable()
