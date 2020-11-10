@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
   <title>LatestStable API</title>
   <link rel="stylesheet"
@@ -15,19 +15,35 @@
         something is.</p>
       <div class="card">
         <div class="card-body"><h2>Try it!</h2>
-          <code><a href="https://lateststable.org/v1/pypi/requests">https://lateststable.org/v1/pypi/requests</a></code>
+          <ul>
+            <li><code><a href="https://lateststable.org/v1/pypi/requests">https://lateststable.org/v1/pypi/requests</a></code>
+            </li>
+            <li><code><a href="https://lateststable.org/v1/jetbrains/pycharm">https://lateststable.org/v1/jetbrains/pycharm</a></code>
+            </li>
+            <li><code><a href="https://lateststable.org/v1/docker/bitnami/redis">https://lateststable.org/v1/docker/bitnami/redis</a></code>
+            </li>
+            <li><code><a href="https://lateststable.org/v1/github/kubernetes/ingress-nginx">https://lateststable.org/v1/github/kubernetes/ingress-nginx</a></code>
+            </li>
+            <li><code><a href="https://lateststable.org/v1/wikipedia/Linux">https://lateststable.org/v1/wikipedia/Linux</a></code>
+            </li>
+            <li><code><a href="https://lateststable.org/v1/npm/axios">https://lateststable.org/v1/npm/axios</a></code>
+            </li>
+          </ul>
         </div>
       </div>
-      <p>There's currently four endpoints:
-        <ul>
-          <li>Pypi</li>
-          <li>Github</li>
-          <li>Docker</li>
-          <li>Wikipedia</li>
-        </ul></p>
+      <p>There's currently six endpoints:</p>
+      <ul>
+        <li>Pypi</li>
+        <li>Github</li>
+        <li>Docker</li>
+        <li>Wikipedia</li>
+        <li>Jetbrains</li>
+        <li>NPM</li>
+      </ul>
       <p>The result will always be in this format:</p>
       <pre><code>
 {
+  "name": "somepackage",
   "version": "3.2.1",
   "platform_version_string": "3.2.1",
   "major": "32",
