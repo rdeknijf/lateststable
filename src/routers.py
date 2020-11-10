@@ -35,4 +35,9 @@ async def get_github(user: str, repo: str):
 
 @router.get('/wikipedia/{package}', response_model=Result)
 async def get_wikipedia(package: str):
-    return await lst.wikipedia(package)
+    return lst.wikipedia(package)
+
+
+@router.get('/npm/{package}', response_model=Result)
+async def get_npm(package: str):
+    return lst.npm(package)

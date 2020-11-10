@@ -242,6 +242,17 @@ class LatestStable:
 
         return None
 
+    def npm(self, package: str) -> Optional[Result]:
+
+        url = f'http://registry.npmjs.org/{package}'
+
+        r = requests.get(url)
+
+        if r.ok:
+            return self._prep_output(package, r.json()['dist-tags']['latest'])
+
+        return None
+
     def _prep_output(self, name: str, version_string: Optional[str]) -> Optional[Result]:
 
         if not version_string:
