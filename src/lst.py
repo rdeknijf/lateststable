@@ -166,10 +166,10 @@ class LatestStable:
                 reg = self.re_version_free.search(text)
 
                 if reg:
-                    version = reg.group(1)
+                    found_version = reg.group(1)
 
-                    if version:
-                        return version
+                    if found_version:
+                        return found_version
 
                 return None
 
