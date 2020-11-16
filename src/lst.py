@@ -253,6 +253,15 @@ class LatestStable:
 
         return None
 
+    def helm(self, repo: str, chart: str) -> Optional[Result]:
+
+        url = f"https://artifacthub.io/api/v1/packages/helm/{repo}/{chart}"
+
+        r = requests.get(url)
+
+        if r.ok:
+            return self._prep_output(f'{repo}/{chart}', r.json()['version'])
+
     def _prep_output(self, name: str, version_string: Optional[str]) -> Optional[Result]:
 
         if not version_string:
@@ -274,6 +283,11 @@ class LatestStable:
                       major=str(version.major),
                       minor=str(version.minor),
                       patch=str(version.micro))
+
+
+
+
+
 
 
 lst = LatestStable()

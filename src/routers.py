@@ -41,3 +41,8 @@ async def get_wikipedia(package: str):
 @router.get('/npm/{package}', response_model=Result)
 async def get_npm(package: str):
     return lst.npm(package)
+
+
+@router.get('/helm/{repo}/{chart}', response_model=Result)
+async def get_helm(repo: str, chart: str):
+    return lst.helm(repo, chart)
