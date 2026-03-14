@@ -1,0 +1,8 @@
+name = "lateststable"
+main = "src/index.ts"
+compatibility_date = "2026-03-01"
+
+# Uncomment after: wrangler kv namespace create VERSIONS
+# [[kv_namespaces]]
+# binding = "VERSIONS"
+# id = "your-namespace-id"
