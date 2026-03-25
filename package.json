@@ -1,0 +1,15 @@
+{
+  "name": "lateststable",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch run src/server.ts",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "bun-types": "^1.2.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
+  }
+}

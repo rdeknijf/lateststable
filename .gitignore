@@ -1,6 +1,3 @@
-.*
-requirements.txt
-!/.github/
-!/.style.yapf
-!/.editorconfig
-!/.dockerignore
+node_modules/
+dist/
+*.tsbuildinfo
