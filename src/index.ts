@@ -1,8 +1,14 @@
 import * as platforms from "./platforms";
 import type { VersionResult } from "./platforms";
+import { NotFoundError } from "./platforms";
+
+export interface CacheStore {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+}
 
 export interface Env {
-  VERSIONS?: KVNamespace;
+  VERSIONS?: CacheStore;
 }
 
 type Handler = (params: string[]) => Promise<VersionResult>;
@@ -29,11 +35,19 @@ const CORS = {
   "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
-function json(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data, null, 2) + "\n", {
-    status,
-    headers: { "Content-Type": "application/json", ...CORS },
-  });
+const MAX_PARAM_LEN = 256;
+const SAFE_PARAM = /^[\w.@\/-]+$/;
+
+function validateParams(params: string[]): boolean {
+  return params.every(
+    (p) => p.length > 0 && p.length <= MAX_PARAM_LEN && SAFE_PARAM.test(p) && !p.includes(".."),
+  );
+}
+
+function json(data: unknown, status = 200, cache = false): Response {
+  const headers: Record<string, string> = { "Content-Type": "application/json", ...CORS };
+  if (cache) headers["Cache-Control"] = "public, s-maxage=3600, max-age=300";
+  return new Response(JSON.stringify(data, null, 2) + "\n", { status, headers });
 }
 
 export default {
@@ -44,6 +58,10 @@ export default {
 
     const url = new URL(request.url);
     const path = url.pathname;
+
+    if (path === "/health") {
+      return json({ status: "ok" });
+    }
 
     if (path === "/" || path === "") {
       return new Response(HOMEPAGE, {
@@ -61,10 +79,14 @@ export default {
       if (!match) continue;
       const params = match.slice(1);
 
+      if (!validateParams(params)) {
+        return json({ error: "Invalid parameter" }, 400);
+      }
+
       // Check cache
       if (env.VERSIONS) {
         const cached = await env.VERSIONS.get(path);
-        if (cached) return json(JSON.parse(cached));
+        if (cached) return json(JSON.parse(cached), 200, true);
       }
 
       try {
@@ -72,9 +94,12 @@ export default {
         if (env.VERSIONS) {
           await env.VERSIONS.put(path, JSON.stringify(result), { expirationTtl: 3600 });
         }
-        return json(result);
-      } catch (err: any) {
-        return json({ error: err.message }, 404);
+        return json(result, 200, true);
+      } catch (err: unknown) {
+        if (err instanceof NotFoundError) {
+          return json({ error: err.message }, 404);
+        }
+        return json({ error: "Upstream request failed" }, 502);
       }
     }
 

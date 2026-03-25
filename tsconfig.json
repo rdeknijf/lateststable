@@ -6,7 +6,7 @@
     "strict": true,
     "noEmit": true,
     "lib": ["ESNext"],
-    "types": ["@cloudflare/workers-types"]
+    "types": ["bun-types"]
   },
   "include": ["src", "test"]
 }

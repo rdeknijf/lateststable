@@ -3,7 +3,10 @@ import worker from "../../src/index";
 import type { Env } from "../../src/index";
 
 const mockFetch = vi.fn();
-beforeEach(() => vi.stubGlobal("fetch", mockFetch));
+beforeEach(() => {
+  mockFetch.mockReset();
+  vi.stubGlobal("fetch", mockFetch);
+});
 afterEach(() => vi.restoreAllMocks());
 
 function jsonResponse(body: unknown, status = 200) {
@@ -130,5 +133,76 @@ describe("response format", () => {
     expect(text).toContain("\n");
     expect(text).toMatch(/\n$/);
     expect(text).toContain("  ");
+  });
+});
+
+describe("health check", () => {
+  it("GET /health returns 200 with status ok", async () => {
+    const res = await worker.fetch(req("/health"), env);
+    expect(res.status).toBe(200);
+    const data: any = await res.json();
+    expect(data.status).toBe("ok");
+  });
+});
+
+describe("input validation", () => {
+  it("path traversal is neutralized by URL parsing", async () => {
+    // new URL() normalizes ../../ so /v1/pypi/../../etc/passwd becomes /etc/passwd
+    const res = await worker.fetch(req("/v1/pypi/../../etc/passwd"), env);
+    expect(res.status).toBe(404);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects encoded path traversal", async () => {
+    const res = await worker.fetch(req("/v1/pypi/..%2f..%2fetc%2fpasswd"), env);
+    expect(res.status).toBe(400);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects params with control characters", async () => {
+    const res = await worker.fetch(req("/v1/pypi/pkg%00name"), env);
+    expect(res.status).toBe(400);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects overly long params", async () => {
+    const long = "a".repeat(257);
+    const res = await worker.fetch(req(`/v1/pypi/${long}`), env);
+    expect(res.status).toBe(400);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("accepts valid package names with dots and hyphens", async () => {
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({ info: { version: "1.0.0" } }),
+    );
+    const res = await worker.fetch(req("/v1/pypi/my-package.v2"), env);
+    expect(res.status).toBe(200);
+  });
+
+  it("accepts scoped npm packages", async () => {
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({ "dist-tags": { latest: "1.0.0" } }),
+    );
+    const res = await worker.fetch(req("/v1/npm/@scope/pkg"), env);
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("upstream failure handling", () => {
+  it("returns 502 for unexpected upstream errors", async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError("fetch failed"));
+    const res = await worker.fetch(req("/v1/pypi/fastapi"), env);
+    expect(res.status).toBe(502);
+    const data: any = await res.json();
+    expect(data.error).toBe("Upstream request failed");
+  });
+
+  it("does not leak internal error details", async () => {
+    mockFetch.mockRejectedValueOnce(new Error("Cannot read properties of undefined"));
+    const res = await worker.fetch(req("/v1/pypi/fastapi"), env);
+    expect(res.status).toBe(502);
+    const data: any = await res.json();
+    expect(data.error).not.toContain("Cannot read");
   });
 });
