@@ -128,7 +128,7 @@ const HOMEPAGE = `<!DOCTYPE html>
     @media (prefers-color-scheme: dark) {
       body { color: #e0e0e0; background: #1a1a1a; }
       a { color: #6cb6ff; }
-      .example { background: #2d2d2d; border-color: #404040; }
+      .example { background: #1e1e1e; border-color: #333; }
     }
     h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
     .tagline { color: #666; margin-bottom: 2rem; }
@@ -140,14 +140,14 @@ const HOMEPAGE = `<!DOCTYPE html>
     .platforms li { margin-bottom: 0.35rem; font-size: 0.95rem; }
     .platforms .name { font-weight: 600; display: inline-block; min-width: 100px; }
     .example {
-      background: #f5f5f5;
-      border: 1px solid #e0e0e0;
+      background: #1e1e1e;
+      border: 1px solid #333;
       border-radius: 6px;
       padding: 1rem;
       margin-bottom: 2rem;
       overflow-x: auto;
     }
-    .example pre { font-size: 0.85rem; line-height: 1.5; }
+    .example pre { font-size: 0.85rem; line-height: 1.5; color: #e0e0e0; }
     footer { color: #999; font-size: 0.85rem; }
   </style>
 </head>
