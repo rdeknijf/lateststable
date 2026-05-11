@@ -28,6 +28,7 @@ const routes: [RegExp, string, Handler][] = [
   [/^\/v1\/packagist\/([^/]+)\/([^/]+)$/, "packagist", ([v, p]) => platforms.packagist(v, p)],
   [/^\/v1\/aur\/(.+)$/, "aur", ([p]) => platforms.aur(p)],
   [/^\/v1\/maven\/([^/]+)\/([^/]+)$/, "maven", ([g, a]) => platforms.maven(g, a)],
+  [/^\/v1\/artifacthub\/([^/]+)\/([^/]+)\/([^/]+)$/, "artifacthub", ([k, r, p]) => platforms.artifacthub(k, r, p)],
 ];
 
 const CORS = {
@@ -169,6 +170,7 @@ const HOMEPAGE = `<!DOCTYPE html>
     <li><span class="name">Maven</span> <a href="/v1/maven/org.apache.kafka/kafka-clients">/v1/maven/{groupId}/{artifactId}</a></li>
     <li><span class="name">Helm</span> <a href="/v1/helm/bitnami/postgresql">/v1/helm/{repo}/{chart}</a></li>
     <li><span class="name">JetBrains</span> <a href="/v1/jetbrains/IIU">/v1/jetbrains/{product}</a></li>
+    <li><span class="name">Artifact Hub</span> <a href="/v1/artifacthub/helm/bitnami/postgresql">/v1/artifacthub/{kind}/{repo}/{package}</a></li>
     <li><span class="name">AUR</span> <a href="/v1/aur/yay">/v1/aur/{package}</a></li>
   </ul>
 

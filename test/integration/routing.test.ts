@@ -57,7 +57,7 @@ describe("/v1", () => {
     const res = await worker.fetch(req("/v1"), env);
     expect(res.status).toBe(200);
     const data: any = await res.json();
-    expect(data.platforms).toHaveLength(14);
+    expect(data.platforms).toHaveLength(15);
     expect(data.platforms).toContain("pypi");
     expect(data.platforms).toContain("npm");
     expect(data.platforms).toContain("docker");
@@ -81,6 +81,7 @@ describe("route matching", () => {
     ["/v1/packagist/laravel/framework", "packagist", { packages: { "laravel/framework": [{ version: "11.0.0" }] } }],
     ["/v1/aur/yay", "aur", { results: [{ Version: "12.0.0-1" }] }],
     ["/v1/maven/org/art", "maven", { response: { docs: [{ latestVersion: "1.0.0" }] } }],
+    ["/v1/artifacthub/helm/bitnami/pg", "artifacthub", { version: "1.0.0" }],
   ];
 
   it.each(routes)("GET %s returns 200 with platform=%s", async (path, platform, mockBody) => {

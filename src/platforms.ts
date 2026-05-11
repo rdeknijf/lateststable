@@ -168,6 +168,16 @@ export async function aur(pkg: string): Promise<VersionResult> {
   return result(pkg, version, "aur");
 }
 
+// Artifact Hub (all package types)
+export async function artifacthub(kind: string, repo: string, pkg: string): Promise<VersionResult> {
+  const res = await upstream(
+    `https://artifacthub.io/api/v1/packages/${encodeURIComponent(kind)}/${encodeURIComponent(repo)}/${encodeURIComponent(pkg)}`,
+  );
+  if (!res.ok) throw new NotFoundError(`Package '${repo}/${pkg}' (${kind}) not found on Artifact Hub`);
+  const data: any = await res.json();
+  return result(`${repo}/${pkg}`, data.version, "artifacthub", data.created_at?.split("T")[0]);
+}
+
 // Maven Central
 export async function maven(groupId: string, artifactId: string): Promise<VersionResult> {
   const res = await upstream(

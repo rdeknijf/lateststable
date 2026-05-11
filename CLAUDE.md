@@ -18,7 +18,7 @@ Free JSON API for the latest stable version of anything. Self-hosted via Docker 
 ## Architecture
 
 - `src/index.ts` — routing, caching, CORS, homepage HTML
-- `src/platforms.ts` — 14 platform fetchers (pypi, npm, github, docker, jetbrains, helm, crates, go, homebrew, rubygems, nuget, packagist, aur, maven)
+- `src/platforms.ts` — 15 platform fetchers (pypi, npm, github, docker, jetbrains, helm, crates, go, homebrew, rubygems, nuget, packagist, aur, maven, artifacthub)
 - `src/version.ts` — parseVersion, isSemver, compareSemver
 - `src/cache.ts` — in-memory TTL cache (1 hour default)
 - `src/server.ts` — Bun HTTP server entrypoint
