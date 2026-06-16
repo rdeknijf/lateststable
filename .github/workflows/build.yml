@@ -1,0 +1,50 @@
+name: build
+
+# Release pipeline (square model E): build an immutable image tagged with the
+# commit SHA and push it to GHCR. Deploy is a SEPARATE step — square pins this
+# SHA in context/lateststable/infra/ and Flux reconciles it onto the cluster.
+# No :latest tag (deploy = pinning a SHA, never a moving tag).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write          # push to ghcr.io/rdeknijf/* with the built-in GITHUB_TOKEN
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false   # don't cancel a release build mid-push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (tag = commit SHA)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/rdeknijf/lateststable:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        run: |
+          echo "Pushed ghcr.io/rdeknijf/lateststable:${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Then in square: pin this SHA in context/lateststable/infra/deployment.yaml," >> "$GITHUB_STEP_SUMMARY"
+          echo "make the GHCR package private, and reseal ghcr-pull for ns lateststable." >> "$GITHUB_STEP_SUMMARY"
