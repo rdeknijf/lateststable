@@ -1,9 +1,9 @@
 name: build
 
-# Release pipeline (square model E): build an immutable image tagged with the
-# commit SHA and push it to GHCR. Deploy is a SEPARATE step — square pins this
-# SHA in context/lateststable/infra/ and Flux reconciles it onto the cluster.
-# No :latest tag (deploy = pinning a SHA, never a moving tag).
+# Release pipeline: build an immutable image tagged with the commit SHA and push
+# it to GHCR. Deploy is a SEPARATE step — a private GitOps repo pins this SHA and
+# reconciles it onto the cluster. No :latest tag (deploy = pinning a SHA, never a
+# moving tag).
 
 on:
   push:
@@ -46,5 +46,4 @@ jobs:
         run: |
           echo "Pushed ghcr.io/rdeknijf/lateststable:${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Then in square: pin this SHA in context/lateststable/infra/deployment.yaml," >> "$GITHUB_STEP_SUMMARY"
-          echo "make the GHCR package private, and reseal ghcr-pull for ns lateststable." >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploy: pin this SHA in the private GitOps repo and let it reconcile." >> "$GITHUB_STEP_SUMMARY"

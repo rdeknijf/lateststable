@@ -1,6 +1,8 @@
 # lateststable
 
-Free JSON API for the latest stable version of anything. Self-hosted via Docker + Traefik.
+Free JSON API for the latest stable version of anything. Containerized; the
+production instance runs on k3s (image built to GHCR by CI, SHA-pinned by a
+private GitOps repo).
 
 ## Stack
 
@@ -13,7 +15,7 @@ Free JSON API for the latest stable version of anything. Self-hosted via Docker 
 - `bun run dev` — local dev server with watch mode
 - `bun run start` — production server
 - `bun run test` — run all tests
-- `docker compose up -d --build` — deploy via Docker
+- `docker compose up --build` — run locally via Docker
 
 ## Architecture
 

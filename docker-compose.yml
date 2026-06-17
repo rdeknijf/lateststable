@@ -1,20 +1,11 @@
+# Portable local run: `docker compose up --build` → http://localhost:3000.
+# Production runs on k3s (image built to GHCR by CI, SHA-pinned by a private GitOps
+# repo); routing/TLS there is the cluster ingress's job, not a compose label.
 services:
   lateststable:
     build: .
-    container_name: lateststable
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       - PORT=3000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lateststable.rule=Host(`lateststable.org`) || Host(`www.lateststable.org`)"
-      - "traefik.http.routers.lateststable.entrypoints=websecure"
-      - "traefik.http.routers.lateststable.tls.certresolver=myresolver"
-      - "traefik.http.services.lateststable.loadbalancer.server.port=3000"
-      - "traefik.docker.network=proxy"
-    networks:
-      - proxy
-
-networks:
-  proxy:
-    external: true
