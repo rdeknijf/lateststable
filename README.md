@@ -58,11 +58,18 @@ bun run test
 
 ## Deploy
 
+The container listens on `$PORT` (default `3000`) and exposes `/health` for
+readiness checks, so it runs anywhere:
+
 ```bash
-docker compose up -d --build
+docker compose up --build        # local → http://localhost:3000
 ```
 
-The included `Dockerfile` builds a minimal image (~50MB) using `oven/bun:1-alpine`. Configure your reverse proxy to route traffic to port 3000.
+The `Dockerfile` builds a minimal image (~50MB, `oven/bun:1-alpine`, non-root).
+The production instance at [lateststable.org](https://lateststable.org) runs on a
+single-node k3s cluster: CI builds an immutable image tagged with the commit SHA,
+pushes it to GHCR, and the Deployment pins that SHA (no moving `:latest`). Point
+any ingress/reverse proxy at port 3000.
 
 ## Architecture
 
