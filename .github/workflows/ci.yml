@@ -1,0 +1,36 @@
+name: ci
+
+# The checks a pull request must pass before it merges: the type check and the
+# test suite. Merges go through gh-merge-guarded, which refuses a PR with zero
+# checks, so this workflow is what makes a PR mergeable at all. The release
+# image build is build.yml. The only prek hook here (beads-export) needs bd and
+# the beads server, so CI does not run prek.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install the locked dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        run: bunx tsc --noEmit
+
+      - name: Tests
+        run: bun run test
