@@ -35,7 +35,7 @@ In-memory TTL cache (1 hour). Errors are not cached. The server functions withou
 
 ## Issue tracking
 
-The backlog is beads in this repository: `.beads/`, id prefix `lst`, synced with GitHub issues in `rdeknijf/lateststable`. The tracked `.beads/issues.jsonl` is the backup, and a pre-commit hook (`scripts/bd-export-hook.sh`) keeps it current on every commit. On a fresh clone, restore the working data with `bd bootstrap --yes`.
+The backlog is beads in this repository: `.beads/`, id prefix `lst`, synced with GitHub issues in `rdeknijf/lateststable`. The tracked `.beads/issues.jsonl` is the backup, and a pre-commit hook (`scripts/bd-export-hook.sh`) keeps it current on every commit. The working data lives on the erebor Dolt server (`.beads/metadata.json`), so `bd` works on a fresh clone without a restore step.
 
 Pull at the start of a session:
 
