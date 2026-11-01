@@ -8,7 +8,7 @@ Free public JSON API at lateststable.org that returns the latest stable version 
 
 ## Last Run
 
-2026-11-01: refresh on branch `chore/refresh-2026-11`. Dependencies and GitHub Actions to latest, a live-vs-upstream check of 37 lookups, and fixes for the maven, crates, and docker sources and for upstream error mapping.
+2026-11-01: refresh (PR #7, merged as `c58a65f`, deployed through square PR #1020). Dependencies and GitHub Actions to latest, a live-vs-upstream check of 37 lookups, and fixes for the maven, crates, and docker sources and for upstream error mapping.
 
 ## Current State
 
@@ -16,9 +16,9 @@ Free public JSON API at lateststable.org that returns the latest stable version 
 - Container listens on `$PORT` (default 3000) and exposes `/health`. `Dockerfile` builds on `oven/bun:1-alpine` (resolved to Bun 1.4.4 on 2026-11-01), non-root.
 - CI: `.github/workflows/ci.yml` runs the type check and tests on every pull request and on `main`. `.github/workflows/build.yml` builds and pushes `ghcr.io/rdeknijf/lateststable:<full commit SHA>` on every push to `main`. No `:latest` tag.
 - Deploy: Flux Kustomization `clusters/buckland/flux/kustomization-lateststable.yaml` in square applies `context/lateststable/infra/` (Deployment, Service, Ingress for `lateststable.org` and `www.lateststable.org`, `ghcr-pull` SealedSecret). A merge here does not deploy: the Deployment pins the image SHA in square.
-- Live (checked 2026-11-01): Deployment `lateststable` in namespace `lateststable` on buckland is 1/1 and runs `ghcr.io/rdeknijf/lateststable:7e47d2572ef6a2688f762e855877ea2d0e1df754`. Commits after `7e47d25` on `main` were docs, CI, and beads only until this refresh.
+- Live (checked 2026-11-01 08:30 UTC): Deployment `lateststable` in namespace `lateststable` on buckland is 1/1 and runs `ghcr.io/rdeknijf/lateststable:c58a65fd067c554c4e3b2f824d11389e50a6511c`. Live answers after the deploy: kafka-clients 4.4.0, guava 33.7.2-jre, wasmtime 50.0.1, library/node 26.13.0.
 - Upstream check (2026-11-01): pypi, npm, github, docker, crates, go, homebrew, rubygems, nuget, packagist, helm, artifacthub, jetbrains, and aur matched upstream. Wrong before this refresh: maven (stale search index, milestones and RCs returned), crates (a backport published after a newer major won), docker (`26.13` instead of `26.13.0`), and every source reported an upstream 403/429/5xx as 404.
-- Backlog: beads `lst` on the erebor Dolt server. Open: `lst-efu` (authenticate GitHub calls, 60/hour unauthenticated limit) and `lst-5xj` (tags fallback for repos without GitHub Releases).
+- Backlog: beads `lst` on the erebor Dolt server. Open: `lst-efu` (authenticate GitHub calls, 60/hour unauthenticated limit; waits on `lst-sbh`, Rutger creates the token) and `lst-5xj` (tags fallback for repos without GitHub Releases).
 
 ## Decisions
 
