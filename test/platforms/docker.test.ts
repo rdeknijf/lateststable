@@ -29,6 +29,16 @@ describe("docker", () => {
     });
   });
 
+  it("prefers the most specific of equal tags", async () => {
+    // Docker Hub lists node 26.13.0, 26.13 and 26 for the same image.
+    mockFetch.mockResolvedValueOnce(
+      tagsResponse(["26.13.0", "26.13", "26", "24.22.2", "24.22", "24"]),
+    );
+
+    const res = await docker("library", "node");
+    expect(res.version).toBe("26.13.0");
+  });
+
   it("filters non-semver tags", async () => {
     mockFetch.mockResolvedValueOnce(
       tagsResponse(["latest", "alpine", "slim", "2.0.0"]),

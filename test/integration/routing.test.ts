@@ -80,12 +80,14 @@ describe("route matching", () => {
     ["/v1/nuget/Pkg", "nuget", { versions: ["1.0.0"] }],
     ["/v1/packagist/laravel/framework", "packagist", { packages: { "laravel/framework": [{ version: "11.0.0" }] } }],
     ["/v1/aur/yay", "aur", { results: [{ Version: "12.0.0-1" }] }],
-    ["/v1/maven/org/art", "maven", { response: { docs: [{ latestVersion: "1.0.0" }] } }],
+    ["/v1/maven/org/art", "maven", "<metadata><versioning><versions><version>1.0.0</version></versions></versioning></metadata>"],
     ["/v1/artifacthub/helm/bitnami/pg", "artifacthub", { version: "1.0.0" }],
   ];
 
   it.each(routes)("GET %s returns 200 with platform=%s", async (path, platform, mockBody) => {
-    mockFetch.mockResolvedValueOnce(jsonResponse(mockBody));
+    mockFetch.mockResolvedValueOnce(
+      typeof mockBody === "string" ? new Response(mockBody) : jsonResponse(mockBody),
+    );
     const res = await worker.fetch(req(path), env);
     expect(res.status).toBe(200);
     const data: any = await res.json();
@@ -197,6 +199,22 @@ describe("upstream failure handling", () => {
     expect(res.status).toBe(502);
     const data: any = await res.json();
     expect(data.error).toBe("Upstream request failed");
+  });
+
+  it.each([403, 429, 500, 503])("returns 502, not 404, when upstream answers %i", async (status) => {
+    // GitHub answers 403 when the unauthenticated 60/hour limit is spent.
+    mockFetch.mockResolvedValueOnce(jsonResponse({ message: "API rate limit exceeded" }, status));
+    const res = await worker.fetch(req("/v1/github/denoland/deno"), env);
+    expect(res.status).toBe(502);
+    const data: any = await res.json();
+    expect(data.error).toBe("Upstream request failed");
+  });
+
+  it("returns 404 when upstream answers 410", async () => {
+    // proxy.golang.org answers 410 Gone for a module it cannot find.
+    mockFetch.mockResolvedValueOnce(new Response("not found", { status: 410 }));
+    const res = await worker.fetch(req("/v1/go/example.com/nope"), env);
+    expect(res.status).toBe(404);
   });
 
   it("does not leak internal error details", async () => {

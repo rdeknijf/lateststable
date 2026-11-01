@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseVersion, isSemver, compareSemver } from "../src/version";
+import { parseVersion, isSemver, compareSemver, compareNumericPrefix } from "../src/version";
 
 describe("parseVersion", () => {
   it.each([
@@ -80,5 +80,18 @@ describe("compareSemver", () => {
     const versions = ["1.9.0", "1.10.0", "2.0.0", "0.1.0", "1.0.0"];
     const sorted = [...versions].sort(compareSemver);
     expect(sorted).toEqual(["0.1.0", "1.0.0", "1.9.0", "1.10.0", "2.0.0"]);
+  });
+});
+
+describe("compareNumericPrefix", () => {
+  it.each([
+    ["33.7.2-jre", "33.7.2-android", 0],
+    ["33.10.0-jre", "33.9.0-jre", 1],
+    ["2.10.1", "2.9.1", 1],
+    ["1.0", "1.0.0", 0],
+    ["1.2.3.4", "1.2.3", 1],
+    ["v2.0.0", "1.9.9", 1],
+  ])("compares %s with %s", (a, b, sign) => {
+    expect(Math.sign(compareNumericPrefix(a, b))).toBe(sign);
   });
 });
