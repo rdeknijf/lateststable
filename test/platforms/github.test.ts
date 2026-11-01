@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { github } from "../../src/platforms";
+import { github, NotFoundError, UpstreamError } from "../../src/platforms";
 
 const mockFetch = vi.fn();
 beforeEach(() => vi.stubGlobal("fetch", mockFetch));
@@ -54,5 +54,13 @@ describe("github", () => {
     await expect(github("user", "nope")).rejects.toThrow(
       "No releases found for 'user/nope'",
     );
+  });
+
+  it("reports a rate limit (403) as an upstream failure, not as no releases", async () => {
+    mockFetch.mockResolvedValueOnce(jsonResponse({ message: "API rate limit exceeded" }, 403));
+
+    const err = await github("denoland", "deno").catch((e) => e);
+    expect(err).toBeInstanceOf(UpstreamError);
+    expect(err).not.toBeInstanceOf(NotFoundError);
   });
 });

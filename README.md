@@ -39,6 +39,7 @@ GET https://lateststable.org/v1/pypi/fastapi
 | Maven | `/v1/maven/{groupId}/{artifactId}` | [/v1/maven/org.apache.kafka/kafka-clients](https://lateststable.org/v1/maven/org.apache.kafka/kafka-clients) |
 | Helm | `/v1/helm/{repo}/{chart}` | [/v1/helm/bitnami/postgresql](https://lateststable.org/v1/helm/bitnami/postgresql) |
 | JetBrains | `/v1/jetbrains/{product}` | [/v1/jetbrains/IIU](https://lateststable.org/v1/jetbrains/IIU) |
+| Artifact Hub | `/v1/artifacthub/{kind}/{repo}/{package}` | [/v1/artifacthub/helm/bitnami/postgresql](https://lateststable.org/v1/artifacthub/helm/bitnami/postgresql) |
 | AUR | `/v1/aur/{package}` | [/v1/aur/yay](https://lateststable.org/v1/aur/yay) |
 
 ## Run Locally
@@ -54,7 +55,7 @@ bun run dev
 bun run test
 ```
 
-124 tests covering all platforms, routing, caching, CORS, and error handling.
+Tests cover all platforms, routing, caching, CORS, and error handling. All upstream calls are mocked.
 
 ## Deploy
 

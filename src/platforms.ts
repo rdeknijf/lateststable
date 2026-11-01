@@ -1,4 +1,4 @@
-import { parseVersion, isSemver, compareSemver } from "./version";
+import { parseVersion, isSemver, compareSemver, compareNumericPrefix } from "./version";
 
 export interface VersionResult {
   name: string;
@@ -15,6 +15,22 @@ export class NotFoundError extends Error {
     super(message);
     this.name = "NotFoundError";
   }
+}
+
+export class UpstreamError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UpstreamError";
+  }
+}
+
+// Only a 404 or 410 means the thing does not exist. Any other failure (a 403
+// rate limit, a 429, a 5xx) is the upstream failing, which the router maps to
+// a 502 instead of a misleading "not found".
+function ensureOk(res: Response, notFound: string): void {
+  if (res.ok) return;
+  if (res.status === 404 || res.status === 410) throw new NotFoundError(notFound);
+  throw new UpstreamError(`Upstream returned HTTP ${res.status}`);
 }
 
 function result(
@@ -38,7 +54,7 @@ async function upstream(url: string): Promise<Response> {
 // PyPI
 export async function pypi(pkg: string): Promise<VersionResult> {
   const res = await upstream(`https://pypi.org/pypi/${encodeURIComponent(pkg)}/json`);
-  if (!res.ok) throw new NotFoundError(`Package '${pkg}' not found on PyPI`);
+  ensureOk(res, `Package '${pkg}' not found on PyPI`);
   const data: any = await res.json();
   return result(pkg, data.info.version, "pypi");
 }
@@ -46,7 +62,7 @@ export async function pypi(pkg: string): Promise<VersionResult> {
 // npm
 export async function npm(pkg: string): Promise<VersionResult> {
   const res = await upstream(`https://registry.npmjs.org/${encodeURIComponent(pkg)}`);
-  if (!res.ok) throw new NotFoundError(`Package '${pkg}' not found on npm`);
+  ensureOk(res, `Package '${pkg}' not found on npm`);
   const data: any = await res.json();
   return result(pkg, data["dist-tags"].latest, "npm");
 }
@@ -56,7 +72,7 @@ export async function github(user: string, repo: string): Promise<VersionResult>
   const res = await upstream(
     `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/releases/latest`,
   );
-  if (!res.ok) throw new NotFoundError(`No releases found for '${user}/${repo}'`);
+  ensureOk(res, `No releases found for '${user}/${repo}'`);
   const data: any = await res.json();
   const version = data.tag_name.replace(/^v/, "");
   return result(`${user}/${repo}`, version, "github", data.published_at?.split("T")[0]);
@@ -67,12 +83,13 @@ export async function docker(user: string, image: string): Promise<VersionResult
   const res = await upstream(
     `https://hub.docker.com/v2/repositories/${encodeURIComponent(user)}/${encodeURIComponent(image)}/tags?page_size=100&ordering=last_updated`,
   );
-  if (!res.ok) throw new NotFoundError(`Image '${user}/${image}' not found on Docker Hub`);
+  ensureOk(res, `Image '${user}/${image}' not found on Docker Hub`);
   const data: any = await res.json();
   const tags = data.results
     .map((t: any) => t.name)
     .filter((t: string) => isSemver(t))
-    .sort(compareSemver)
+    // "26", "26.13" and "26.13.0" compare equal; prefer the most specific tag.
+    .sort((a: string, b: string) => compareSemver(a, b) || a.split(".").length - b.split(".").length)
     .reverse();
   if (!tags.length) throw new NotFoundError(`No semver tags found for '${user}/${image}'`);
   return result(`${user}/${image}`, tags[0].replace(/^v/, ""), "docker");
@@ -83,7 +100,7 @@ export async function jetbrains(product: string): Promise<VersionResult> {
   const res = await upstream(
     `https://data.services.jetbrains.com/products/releases?code=${encodeURIComponent(product)}&latest=true&type=release`,
   );
-  if (!res.ok) throw new NotFoundError(`Product '${product}' not found`);
+  ensureOk(res, `Product '${product}' not found`);
   const data: any = await res.json();
   const releases = data[product];
   if (!releases?.length) throw new NotFoundError(`No releases found for '${product}'`);
@@ -95,7 +112,7 @@ export async function helm(repo: string, chart: string): Promise<VersionResult> 
   const res = await upstream(
     `https://artifacthub.io/api/v1/packages/helm/${encodeURIComponent(repo)}/${encodeURIComponent(chart)}`,
   );
-  if (!res.ok) throw new NotFoundError(`Chart '${repo}/${chart}' not found`);
+  ensureOk(res, `Chart '${repo}/${chart}' not found`);
   const data: any = await res.json();
   return result(`${repo}/${chart}`, data.version, "helm", data.created_at?.split("T")[0]);
 }
@@ -103,17 +120,23 @@ export async function helm(repo: string, chart: string): Promise<VersionResult> 
 // Crates.io (Rust)
 export async function crates(name: string): Promise<VersionResult> {
   const res = await upstream(`https://crates.io/api/v1/crates/${encodeURIComponent(name)}`);
-  if (!res.ok) throw new NotFoundError(`Crate '${name}' not found`);
+  ensureOk(res, `Crate '${name}' not found`);
   const data: any = await res.json();
-  const latest = data.versions?.find((v: any) => !v.yanked);
-  const version = latest?.num ?? data.crate.newest_version;
-  return result(name, version, "crates", latest?.created_at?.split("T")[0]);
+  // newest_version and versions[] order are by publish date, so a backport
+  // (wasmtime 48.0.8 after 50.0.1) would win. max_stable_version is the
+  // highest non-prerelease, non-yanked version.
+  const version =
+    data.crate.max_stable_version ??
+    data.versions?.find((v: any) => !v.yanked)?.num ??
+    data.crate.newest_version;
+  const entry = data.versions?.find((v: any) => v.num === version);
+  return result(name, version, "crates", entry?.created_at?.split("T")[0]);
 }
 
 // Go modules
 export async function go(module: string): Promise<VersionResult> {
   const res = await upstream(`https://proxy.golang.org/${encodeURIComponent(module)}/@latest`);
-  if (!res.ok) throw new NotFoundError(`Module '${module}' not found`);
+  ensureOk(res, `Module '${module}' not found`);
   const data: any = await res.json();
   return result(module, data.Version.replace(/^v/, ""), "go", data.Time?.split("T")[0]);
 }
@@ -121,7 +144,7 @@ export async function go(module: string): Promise<VersionResult> {
 // Homebrew
 export async function homebrew(formula: string): Promise<VersionResult> {
   const res = await upstream(`https://formulae.brew.sh/api/formula/${encodeURIComponent(formula)}.json`);
-  if (!res.ok) throw new NotFoundError(`Formula '${formula}' not found`);
+  ensureOk(res, `Formula '${formula}' not found`);
   const data: any = await res.json();
   return result(formula, data.versions.stable, "homebrew");
 }
@@ -129,7 +152,7 @@ export async function homebrew(formula: string): Promise<VersionResult> {
 // RubyGems
 export async function rubygems(gem: string): Promise<VersionResult> {
   const res = await upstream(`https://rubygems.org/api/v1/gems/${encodeURIComponent(gem)}.json`);
-  if (!res.ok) throw new NotFoundError(`Gem '${gem}' not found`);
+  ensureOk(res, `Gem '${gem}' not found`);
   const data: any = await res.json();
   return result(gem, data.version, "rubygems");
 }
@@ -138,7 +161,7 @@ export async function rubygems(gem: string): Promise<VersionResult> {
 export async function nuget(pkg: string): Promise<VersionResult> {
   const id = pkg.toLowerCase();
   const res = await upstream(`https://api.nuget.org/v3-flatcontainer/${encodeURIComponent(id)}/index.json`);
-  if (!res.ok) throw new NotFoundError(`Package '${pkg}' not found on NuGet`);
+  ensureOk(res, `Package '${pkg}' not found on NuGet`);
   const data: any = await res.json();
   const stable = data.versions.filter((v: string) => !v.includes("-"));
   const version = stable.length ? stable[stable.length - 1] : data.versions[data.versions.length - 1];
@@ -149,7 +172,7 @@ export async function nuget(pkg: string): Promise<VersionResult> {
 export async function packagist(vendor: string, pkg: string): Promise<VersionResult> {
   const fullName = `${vendor}/${pkg}`;
   const res = await upstream(`https://repo.packagist.org/p2/${encodeURIComponent(vendor)}/${encodeURIComponent(pkg)}.json`);
-  if (!res.ok) throw new NotFoundError(`Package '${fullName}' not found on Packagist`);
+  ensureOk(res, `Package '${fullName}' not found on Packagist`);
   const data: any = await res.json();
   const versions = data.packages[fullName]
     ?.filter((v: any) => !/dev|alpha|beta|RC/i.test(v.version))
@@ -161,7 +184,7 @@ export async function packagist(vendor: string, pkg: string): Promise<VersionRes
 // AUR (Arch User Repository)
 export async function aur(pkg: string): Promise<VersionResult> {
   const res = await upstream(`https://aur.archlinux.org/rpc/v5/info/${encodeURIComponent(pkg)}`);
-  if (!res.ok) throw new NotFoundError(`Package '${pkg}' not found on AUR`);
+  ensureOk(res, `Package '${pkg}' not found on AUR`);
   const data: any = await res.json();
   if (!data.results?.length) throw new NotFoundError(`Package '${pkg}' not found on AUR`);
   const version = data.results[0].Version.split("-")[0];
@@ -173,18 +196,32 @@ export async function artifacthub(kind: string, repo: string, pkg: string): Prom
   const res = await upstream(
     `https://artifacthub.io/api/v1/packages/${encodeURIComponent(kind)}/${encodeURIComponent(repo)}/${encodeURIComponent(pkg)}`,
   );
-  if (!res.ok) throw new NotFoundError(`Package '${repo}/${pkg}' (${kind}) not found on Artifact Hub`);
+  ensureOk(res, `Package '${repo}/${pkg}' (${kind}) not found on Artifact Hub`);
   const data: any = await res.json();
   return result(`${repo}/${pkg}`, data.version, "artifacthub", data.created_at?.split("T")[0]);
 }
 
 // Maven Central
+// Reads maven-metadata.xml from the repository itself. The search.maven.org
+// index lags months behind, and <release> can be a milestone or RC.
+const MAVEN_PRERELEASE = /[-.](alpha|beta|rc|cr|m|milestone|snapshot|preview|ea|dev|pre)([-.]?\d+)?([-.]|$)/i;
+
 export async function maven(groupId: string, artifactId: string): Promise<VersionResult> {
-  const res = await upstream(
-    `https://search.maven.org/solrsearch/select?q=g:${encodeURIComponent(groupId)}+AND+a:${encodeURIComponent(artifactId)}&rows=1&wt=json`,
-  );
-  if (!res.ok) throw new NotFoundError(`Artifact '${groupId}:${artifactId}' not found`);
-  const data: any = await res.json();
-  if (!data.response.docs.length) throw new NotFoundError(`Artifact '${groupId}:${artifactId}' not found`);
-  return result(`${groupId}:${artifactId}`, data.response.docs[0].latestVersion, "maven");
+  const notFound = `Artifact '${groupId}:${artifactId}' not found`;
+  const path = `${groupId.split(".").map(encodeURIComponent).join("/")}/${encodeURIComponent(artifactId)}`;
+  const res = await upstream(`https://repo1.maven.org/maven2/${path}/maven-metadata.xml`);
+  ensureOk(res, notFound);
+  const xml = await res.text();
+  const versions = [...xml.matchAll(/<version>([^<]+)<\/version>/g)].map((m) => m[1].trim());
+  const release = xml.match(/<release>([^<]+)<\/release>/)?.[1].trim();
+  const stable = versions.filter((v) => !MAVEN_PRERELEASE.test(v));
+  if (!stable.length) throw new NotFoundError(`No stable versions for '${groupId}:${artifactId}'`);
+  // <versions> is in publish order, so take the numeric maximum. On a tie
+  // (guava 33.7.2-jre vs 33.7.2-android) prefer <release>, else the last listed.
+  let best = stable[0];
+  for (const v of stable) {
+    const cmp = compareNumericPrefix(v, best);
+    if (cmp > 0 || (cmp === 0 && best !== release)) best = v;
+  }
+  return result(`${groupId}:${artifactId}`, best, "maven");
 }

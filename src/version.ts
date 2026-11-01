@@ -29,3 +29,16 @@ export function compareSemver(a: string, b: string): number {
   }
   return 0;
 }
+
+// Compares the leading dotted numeric part of two versions of any length,
+// ignoring a qualifier: "33.7.2-jre" vs "33.10" compares [33,7,2] with [33,10].
+export function compareNumericPrefix(a: string, b: string): number {
+  const nums = (s: string) => (s.replace(/^v/, "").match(/^\d+(\.\d+)*/)?.[0] ?? "0").split(".").map(Number);
+  const pa = nums(a);
+  const pb = nums(b);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}

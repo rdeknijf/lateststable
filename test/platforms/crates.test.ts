@@ -33,6 +33,24 @@ describe("crates", () => {
     });
   });
 
+  it("uses max_stable_version over a newer-published backport", async () => {
+    // wasmtime: 48.0.8 was published after 50.0.1, so it is newest_version
+    // and first in versions[].
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({
+        crate: { newest_version: "48.0.8", max_stable_version: "50.0.1" },
+        versions: [
+          { num: "48.0.8", yanked: false, created_at: "2026-10-29T00:00:00Z" },
+          { num: "50.0.1", yanked: false, created_at: "2026-10-20T00:00:00Z" },
+        ],
+      }),
+    );
+
+    const res = await crates("wasmtime");
+    expect(res.version).toBe("50.0.1");
+    expect(res.date).toBe("2026-10-20");
+  });
+
   it("skips yanked versions", async () => {
     mockFetch.mockResolvedValueOnce(
       jsonResponse({
