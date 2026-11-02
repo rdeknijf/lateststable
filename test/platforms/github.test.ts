@@ -3,7 +3,10 @@ import { github, NotFoundError, UpstreamError } from "../../src/platforms";
 
 const mockFetch = vi.fn();
 beforeEach(() => vi.stubGlobal("fetch", mockFetch));
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
+});
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status });
@@ -62,5 +65,23 @@ describe("github", () => {
     const err = await github("denoland", "deno").catch((e) => e);
     expect(err).toBeInstanceOf(UpstreamError);
     expect(err).not.toBeInstanceOf(NotFoundError);
+  });
+
+  it("sends GITHUB_TOKEN as a bearer token when set", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "test-token");
+    mockFetch.mockResolvedValueOnce(jsonResponse({ tag_name: "v1.0.0" }));
+
+    await github("user", "repo");
+    const headers = mockFetch.mock.lastCall![1].headers;
+    expect(headers.Authorization).toBe("Bearer test-token");
+    expect(headers["User-Agent"]).toBe("lateststable.org");
+  });
+
+  it("sends no Authorization header without GITHUB_TOKEN", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "");
+    mockFetch.mockResolvedValueOnce(jsonResponse({ tag_name: "v1.0.0" }));
+
+    await github("user", "repo");
+    expect(mockFetch.mock.lastCall![1].headers.Authorization).toBeUndefined();
   });
 });

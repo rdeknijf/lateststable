@@ -44,9 +44,9 @@ function result(
 
 const TIMEOUT_MS = 10_000;
 
-async function upstream(url: string): Promise<Response> {
+async function upstream(url: string, headers: Record<string, string> = {}): Promise<Response> {
   return fetch(url, {
-    headers: { "User-Agent": "lateststable.org" },
+    headers: { "User-Agent": "lateststable.org", ...headers },
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
 }
@@ -67,10 +67,16 @@ export async function npm(pkg: string): Promise<VersionResult> {
   return result(pkg, data["dist-tags"].latest, "npm");
 }
 
-// GitHub releases
+// GitHub releases. GITHUB_TOKEN (optional, read-only) lifts the API limit from 60 to 5000 requests per hour.
+function githubAuth(): Record<string, string> {
+  const auth = process.env.GITHUB_TOKEN;
+  return auth ? { Authorization: `Bearer ${auth}` } : {};
+}
+
 export async function github(user: string, repo: string): Promise<VersionResult> {
   const res = await upstream(
     `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/releases/latest`,
+    githubAuth(),
   );
   ensureOk(res, `No releases found for '${user}/${repo}'`);
   const data: any = await res.json();
