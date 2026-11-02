@@ -60,7 +60,9 @@ Tests cover all platforms, routing, caching, CORS, and error handling. All upstr
 ## Deploy
 
 The container listens on `$PORT` (default `3000`) and exposes `/health` for
-readiness checks, so it runs anywhere:
+readiness checks, so it runs anywhere. Set `GITHUB_TOKEN` (a read-only token, no
+permissions) to lift the GitHub API limit from 60 to 5000 requests per hour;
+without it, GitHub lookups still work but share the anonymous limit:
 
 ```bash
 docker compose up --build        # local → http://localhost:3000
