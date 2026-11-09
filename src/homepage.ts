@@ -403,6 +403,12 @@ footer .right { margin-left: auto; color: var(--muted); }
   var help = document.getElementById("help");
   var say = document.getElementById("say");
   var current = 0;
+  var latest = {};
+
+  function begin(id) {
+    latest[id] = (latest[id] || 0) + 1;
+    return latest[id];
+  }
 
   function tileOf(id) { return document.querySelector('.tile[data-reg="' + id + '"]'); }
 
@@ -439,18 +445,20 @@ footer .right { margin-left: auto; color: var(--muted); }
     ver.classList.remove("long");
     el.querySelector("[data-name]").textContent = name.split("/").pop();
     el.setAttribute("data-pkg", name);
+    el.href = "/v1/" + id + "/" + name;
+    el.title = byId[id].name + ": " + name;
     el.classList.remove("landed");
     el.classList.add("miss");
   }
 
   data.registries.forEach(function (r) {
-    function stale() { return tileOf(r.id).getAttribute("data-pkg") !== r.example; }
+    var n = begin(r.id);
     get("/v1/" + r.id + "/" + r.example).then(function (res) {
-      if (stale()) return;
+      if (latest[r.id] !== n) return;
       if (!res.ok || !res.body) throw new Error("miss");
       paint(r.id, r.example, res.body.version);
     }).catch(function () {
-      if (!stale()) fail(r.id, r.example);
+      if (latest[r.id] === n) fail(r.id, r.example);
     });
   });
 
@@ -504,24 +512,28 @@ footer .right { margin-left: auto; color: var(--muted); }
     }
     var path = "/v1/" + id + "/" + name;
     var token = ++current;
+    var n = begin(id);
     setActive(id);
     curl.textContent = "curl -s " + HOST + path;
     status.textContent = "GET";
     get(path).then(function (res) {
+      var found = res.ok && res.body;
+      if (latest[id] === n) {
+        if (found) paint(id, name, res.body.version);
+        else fail(id, name);
+      }
       if (token !== current) return;
       status.textContent = String(res.status);
-      if (res.ok && res.body) {
+      if (found) {
         showJson(res.body);
-        paint(id, name, res.body.version);
         if (!quiet) say.textContent = res.body.name + " " + res.body.version;
       } else {
-        fail(id, name);
         showError(res.body && res.body.error ? res.body.error : text.unreadable, quiet);
       }
     }).catch(function () {
+      if (latest[id] === n) fail(id, name);
       if (token !== current) return;
       status.textContent = "";
-      fail(id, name);
       showError(text.network, quiet);
     });
   }
