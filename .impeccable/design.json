@@ -1,0 +1,481 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T17:03:33+01:00",
+  "title": "Design System: lateststable.org",
+  "extensions": {
+    "colorMeta": {
+      "stable": {
+        "role": "primary",
+        "displayName": "Stable Black",
+        "canonical": "#0c0d0f",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#232425",
+          "#3f4042",
+          "#5c5e60",
+          "#7f8083",
+          "#a3a4a7",
+          "#c9cacc",
+          "#eeeef0"
+        ],
+        "dark": "#f1f2f3"
+      },
+      "stable-ink": {
+        "role": "primary",
+        "displayName": "Stable Ink",
+        "canonical": "#f4f5f6",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#3f4040",
+          "#5d5e5e",
+          "#7f8081",
+          "#a4a5a5",
+          "#cacacb",
+          "#eeeeef"
+        ],
+        "dark": "#0c0d0f"
+      },
+      "pending": {
+        "role": "primary",
+        "displayName": "Pending Graphite",
+        "canonical": "#33363b",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#222427",
+          "#3d4044",
+          "#5b5e63",
+          "#7d8086",
+          "#a2a5a9",
+          "#c8cbce",
+          "#edeef1"
+        ],
+        "dark": "#c2c6cb"
+      },
+      "alpha": {
+        "role": "secondary",
+        "displayName": "Alpha Yellow",
+        "canonical": "#f2cf1d",
+        "tonalRamp": [
+          "#0f0b00",
+          "#2b2401",
+          "#4c3f01",
+          "#6e5d03",
+          "#967f05",
+          "#bda430",
+          "#decb7a",
+          "#feefb3"
+        ]
+      },
+      "beta": {
+        "role": "secondary",
+        "displayName": "Beta Blue",
+        "canonical": "#5db0ea",
+        "tonalRamp": [
+          "#000d18",
+          "#00273e",
+          "#014469",
+          "#116493",
+          "#3a87bb",
+          "#70acd8",
+          "#a2d1f5",
+          "#e0f1fe"
+        ]
+      },
+      "rc": {
+        "role": "secondary",
+        "displayName": "Candidate Red",
+        "canonical": "#ef6f7c",
+        "tonalRamp": [
+          "#1e0004",
+          "#470514",
+          "#711b2a",
+          "#9e3141",
+          "#c85562",
+          "#e6838b",
+          "#feb4b7",
+          "#fee8e9"
+        ]
+      },
+      "m": {
+        "role": "secondary",
+        "displayName": "Milestone Green",
+        "canonical": "#55bb8a",
+        "tonalRamp": [
+          "#000f06",
+          "#002c1a",
+          "#014d30",
+          "#046f48",
+          "#359469",
+          "#6eb791",
+          "#a1dabb",
+          "#d0fbe2"
+        ]
+      },
+      "snap": {
+        "role": "secondary",
+        "displayName": "Snapshot Orange",
+        "canonical": "#f2994a",
+        "tonalRamp": [
+          "#160700",
+          "#391b00",
+          "#603200",
+          "#8a4b02",
+          "#b86a1a",
+          "#d7935c",
+          "#f5be92",
+          "#ffeadb"
+        ]
+      },
+      "tag-ink": {
+        "role": "secondary",
+        "displayName": "Tag Ink",
+        "canonical": "#15171a",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#232426",
+          "#3e4042",
+          "#5b5e61",
+          "#7e8084",
+          "#a3a5a8",
+          "#c9cbcd",
+          "#edeef0"
+        ]
+      },
+      "focus": {
+        "role": "tertiary",
+        "displayName": "Instrument Violet",
+        "canonical": "#7a3fd1",
+        "tonalRamp": [
+          "#100028",
+          "#2d0858",
+          "#4b2087",
+          "#6c39b9",
+          "#8f5ee5",
+          "#b08cfd",
+          "#d0bfff",
+          "#f0ebfe"
+        ],
+        "dark": "#b79bf0"
+      },
+      "focus-on-stable": {
+        "role": "tertiary",
+        "displayName": "Pale Instrument Violet",
+        "canonical": "#b79bf0",
+        "tonalRamp": [
+          "#0f051f",
+          "#291a43",
+          "#47336a",
+          "#664e93",
+          "#8970bb",
+          "#ac98d8",
+          "#d0c1f5",
+          "#f0ebfe"
+        ],
+        "dark": "#6a35c0"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Chart Paper",
+        "canonical": "#f7f8f8",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#3f4040",
+          "#5d5e5e",
+          "#7f8080",
+          "#a4a5a5",
+          "#cacaca",
+          "#eeeeee"
+        ],
+        "dark": "#0e1012"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#101114",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#232426",
+          "#3f4042",
+          "#5c5d61",
+          "#7f8084",
+          "#a3a4a8",
+          "#c9cacd",
+          "#eeeef0"
+        ],
+        "dark": "#eceef0"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Annotation Gray",
+        "canonical": "#4c5157",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#222427",
+          "#3c4044",
+          "#595e64",
+          "#7c8187",
+          "#a1a5aa",
+          "#c7cbcf",
+          "#eceff2"
+        ],
+        "dark": "#a6adb5"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Grid Line Gray",
+        "canonical": "#c8ccd0",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#222426",
+          "#3e4042",
+          "#5b5e61",
+          "#7d8184",
+          "#a2a5a8",
+          "#c8cbcd",
+          "#edeff0"
+        ],
+        "dark": "#2e3338"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The product name only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Legend, panel, table group, and subsection headings; 14px to 16px in use."
+      },
+      "symbol": {
+        "displayName": "Symbol",
+        "purpose": "The two-letter registry symbol on a tile."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "The primary control label."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Section introductions."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "The page default."
+      },
+      "body-dense": {
+        "displayName": "Body Dense",
+        "purpose": "Tables, definition lists, notes, and the footer."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, help text, legend entries, and column heads."
+      },
+      "version": {
+        "displayName": "Version",
+        "purpose": "The live version on a tile."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "The curl line, the status code, and URL shapes; 13px to 13.5px in use."
+      },
+      "field": {
+        "displayName": "Field",
+        "purpose": "Text in the select and the input."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tile-seam",
+        "value": "0 0 0 .5px var(--paper) inset",
+        "purpose": "Hairline stroke that separates adjacent filled tiles. It carries no height."
+      },
+      {
+        "name": "hollow-stroke",
+        "value": "0 0 0 1px var(--ink) inset",
+        "purpose": "Outline of a tile whose lookup failed, and of its legend key. It carries no height."
+      }
+    ],
+    "motion": [
+      {
+        "name": "tile-land",
+        "value": ".5s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Fill and text color cross-fade when a tile receives its value. Removed under reduced motion."
+      },
+      {
+        "name": "control-hover",
+        "value": ".15s",
+        "purpose": "Fill and text color change on the Get button. Removed under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stacked",
+        "value": "1167px"
+      },
+      {
+        "name": "chart",
+        "value": "1168px"
+      },
+      {
+        "name": "table-blocks",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Registry Tile",
+      "kind": "custom",
+      "refersTo": "tile-stable",
+      "description": "The chart's atom, shown landed and active. Add ds-tile-pending or ds-tile-hollow for the other states.",
+      "html": "<a class=\"ds-tile ds-tile-active\" href=\"#\"><span class=\"ds-sym\">Py</span><span class=\"ds-ver\">0.162.2</span><span class=\"ds-txt ds-pkg\">fastapi</span><span class=\"ds-txt\">PyPI</span></a>",
+      "css": ".ds-tile { position: relative; display: grid; grid-template-rows: auto 1fr auto auto; width: var(--t, 75px); height: var(--t, 75px); padding: calc(var(--t, 75px) * .06); background: var(--stable, #0c0d0f); color: var(--stable-ink, #f4f5f6); text-decoration: none; overflow: hidden; box-shadow: 0 0 0 .5px var(--paper, #f7f8f8) inset; font-family: \"Archivo\", system-ui, sans-serif; transition: background-color .5s cubic-bezier(.16, 1, .3, 1), color .5s cubic-bezier(.16, 1, .3, 1); } .ds-tile:hover, .ds-tile:focus-visible { outline: 3px solid var(--focus-on-stable, #b79bf0); outline-offset: -3px; } .ds-tile-pending { background: var(--pending, #33363b); } .ds-tile-hollow { background: transparent; color: var(--ink, #101114); box-shadow: 0 0 0 1px var(--ink, #101114) inset; } .ds-tile-hollow:hover, .ds-tile-hollow:focus-visible { outline-color: var(--focus, #7a3fd1); } .ds-tile-active::after { content: \"\"; position: absolute; top: 0; right: 0; width: calc(var(--t, 75px) * .2); height: calc(var(--t, 75px) * .2); background: var(--paper, #f7f8f8); } .ds-sym { font: 800 calc(var(--t, 75px) * .26)/1 \"Archivo\", system-ui, sans-serif; font-stretch: 112%; letter-spacing: -.01em; } .ds-ver { font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: max(11px, calc(var(--t, 75px) * .175)); line-height: 1.25; font-weight: 600; } .ds-txt { font-size: max(10.5px, calc(var(--t, 75px) * .135)); line-height: 1.15; } .ds-pkg { font-family: \"Spline Sans Mono\", ui-monospace, monospace; }"
+    },
+    {
+      "name": "Tag Tile",
+      "kind": "custom",
+      "refersTo": "tag-alpha",
+      "description": "A colored prerelease tag cell. Swap the hue per tag.",
+      "html": "<span class=\"ds-tag\">alpha</span>",
+      "css": ".ds-tag { display: flex; align-items: flex-end; width: var(--t, 75px); height: var(--t, 75px); padding: calc(var(--t, 75px) * .07); background: var(--alpha, #f2cf1d); color: var(--tag-ink, #15171a); font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: max(11px, calc(var(--t, 75px) * .14)); line-height: 1; box-shadow: 0 0 0 .5px var(--paper, #f7f8f8) inset; }"
+    },
+    {
+      "name": "Lookup Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "The package field. The registry select shares this treatment.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"fastapi\" aria-label=\"Package\">",
+      "css": ".ds-input { height: 46px; width: 260px; padding: 0 10px; background: transparent; color: var(--ink, #101114); border: 2px solid var(--ink, #101114); border-radius: 0; font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: 16px; caret-color: var(--focus, #7a3fd1); } .ds-input::placeholder { color: var(--muted, #4c5157); opacity: 1; } .ds-input:focus-visible { outline: 3px solid var(--focus, #7a3fd1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Get Button",
+      "kind": "button",
+      "refersTo": "button-get",
+      "description": "The single primary action of the lookup.",
+      "html": "<button class=\"ds-go\" type=\"button\">Get</button>",
+      "css": ".ds-go { height: 46px; padding: 0 20px; font: 700 16px/1 \"Archivo\", system-ui, sans-serif; font-stretch: 112%; background: transparent; color: var(--ink, #101114); border: 2px solid var(--ink, #101114); border-radius: 0; cursor: pointer; transition: background-color .15s, color .15s; } .ds-go:hover { background: var(--stable, #0c0d0f); color: var(--stable-ink, #f4f5f6); border-color: var(--stable, #0c0d0f); } .ds-go:focus-visible { outline: 3px solid var(--focus, #7a3fd1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Copy Control",
+      "kind": "button",
+      "refersTo": "button-copy",
+      "description": "The secondary action, used only on the response panel.",
+      "html": "<div class=\"ds-copy-bg\"><button class=\"ds-copy\" type=\"button\">Copy curl</button></div>",
+      "css": ".ds-copy-bg { display: inline-block; padding: 16px; background: var(--stable, #0c0d0f); color: var(--stable-ink, #f4f5f6); } .ds-copy { font: 500 12px/1 \"Archivo\", system-ui, sans-serif; color: inherit; background: transparent; border: 1px solid color-mix(in srgb, var(--stable-ink, #f4f5f6) 55%, var(--stable, #0c0d0f)); border-radius: 0; padding: 6px 8px; cursor: pointer; white-space: nowrap; } .ds-copy:hover { border-color: var(--stable-ink, #f4f5f6); } .ds-copy:focus-visible { outline: 3px solid var(--focus-on-stable, #b79bf0); outline-offset: -3px; }"
+    },
+    {
+      "name": "Response Panel",
+      "kind": "card",
+      "refersTo": "response-panel",
+      "description": "The largest solid square on the chart, holding one live request and its JSON.",
+      "html": "<div class=\"ds-res\"><div class=\"ds-head\"><strong>Response</strong><span class=\"ds-status\">200</span></div><code class=\"ds-curl\">curl -s https://lateststable.org/v1/pypi/fastapi</code><pre class=\"ds-pre\">{\n  <b>\"version\": \"0.162.2\"</b>,\n  \"platform\": \"pypi\"\n}</pre></div>",
+      "css": ".ds-res { width: calc(var(--t, 75px) * 5); padding: calc(var(--t, 75px) * .28); background: var(--stable, #0c0d0f); color: var(--stable-ink, #f4f5f6); font-family: \"Archivo\", system-ui, sans-serif; } .ds-head { display: flex; justify-content: space-between; font-size: 14px; } .ds-head strong { font-stretch: 112%; } .ds-status { font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: 13px; } .ds-curl { display: block; margin-top: 10px; padding-bottom: 10px; font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; border-bottom: 1px solid color-mix(in srgb, var(--stable-ink, #f4f5f6) 32%, var(--stable, #0c0d0f)); } .ds-pre { margin: 10px 0 0; font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: calc(var(--t, 75px) * .178); line-height: 1.42; } .ds-pre b { font-weight: 600; }"
+    },
+    {
+      "name": "Symbol Badge",
+      "kind": "chip",
+      "refersTo": "symbol-badge",
+      "description": "Ties a rule table row back to its chart tile.",
+      "html": "<span class=\"ds-mini\">Py</span>",
+      "css": ".ds-mini { display: inline-grid; place-items: center; width: 28px; height: 28px; background: var(--stable, #0c0d0f); color: var(--stable-ink, #f4f5f6); font: 800 12px/1 \"Archivo\", system-ui, sans-serif; font-stretch: 112%; }"
+    },
+    {
+      "name": "Legend Row",
+      "kind": "custom",
+      "description": "A printed key that shows the real tile treatment beside its meaning.",
+      "html": "<div class=\"ds-leg\"><span class=\"ds-key\"></span><span>Select a tile to run its lookup</span></div>",
+      "css": ".ds-leg { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: start; font: 400 13px/1.3 \"Archivo\", system-ui, sans-serif; color: var(--ink, #101114); } .ds-key { position: relative; display: inline-block; width: 16px; height: 16px; background: var(--stable, #0c0d0f); } .ds-key::after { content: \"\"; position: absolute; top: 0; right: 0; width: 7px; height: 7px; background: var(--paper, #f7f8f8); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Chart of Nuclides",
+    "overview": "The system treats software versions like a physics reference chart. A stable version is a solid black tile, and a prerelease tag is a colored tile beside it. A reader understands the page the same way a reader understands a printed chart: position, fill, and a legend carry the meaning.\n\nThe surface is lab chart paper with square modules. Density is high inside the chart and calm in the prose below it. The chart is instrument output, so tiles receive real values from the API and show when a value fails. Nothing on the page decorates the chart.\n\nDark mode is the same chart with paper and stable fill exchanged. The chart keeps its structure and its five tag hues.",
+    "keyCharacteristics": [
+      "One square module sizes the chart, the gutters, and the section rhythm.",
+      "A solid fill means a registry or an API answer.",
+      "Five saturated hues name prerelease tags and do nothing else.",
+      "Expanded Archivo names things, and Spline Sans Mono shows what the API reads or returns.",
+      "All corners are square and no surface has elevation."
+    ],
+    "rules": [
+      {
+        "name": "The Stable Fill Rule",
+        "body": "A solid Stable Black fill marks a registry or an API answer: a tile, a symbol badge, a legend key, or the response panel. The Get button takes this fill on hover and is the only control that does. No band, card, or navigation takes it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Prerelease Hue Rule",
+        "body": "The five tag hues appear only on tag tiles and on their legend key. A link, a status, or an error never uses them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Exchange Rule",
+        "body": "Dark mode exchanges paper, ink, stable fill, pending, and focus values. The five tag hues and Tag Ink stay identical in both schemes.",
+        "section": "colors"
+      },
+      {
+        "name": "The State Violet Rule",
+        "body": "Violet appears only for interaction state: focus, hover outline on a tile, selection, and caret. It never decorates a surface.",
+        "section": "colors"
+      },
+      {
+        "name": "The Expanded Voice Rule",
+        "body": "Expanded width (112%) belongs to names and headings: the product name, symbols, headings, and the Get button. Running text stays at 100%.",
+        "section": "typography"
+      },
+      {
+        "name": "The Machine Voice Rule",
+        "body": "Spline Sans Mono carries what the API reads or returns: code, URLs, versions, tag names, status codes, JSON, and the lookup controls. Prose never uses it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tile Text Rule",
+        "body": "Text under 12px exists only inside a chart tile, where the module sets the limit. Every other surface starts at 12px.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Module Rule",
+        "body": "On the wide layout, chart cells, type, gutters, and section gaps derive from the module. A new chart element takes whole cells.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Chart Rule",
+        "body": "No surface casts a shadow. An inset stroke with zero offset is the only permitted use of `box-shadow`.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Rule",
+        "body": "Every tile, panel, control, and badge has square corners.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Notch Rule",
+        "body": "The top right notch means one thing: this tile ran the most recent lookup. Exactly one tile carries it.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do size any chart element in whole modules.",
+      "Do show a failed lookup with a hollow tile and the word \"failed\".",
+      "Do give each new tile state a key in the printed legend.",
+      "Do use Instrument Violet for every focus ring, and Pale Instrument Violet on a stable-filled surface.",
+      "Do test both color schemes, because the stable fill changes from near-black to near-white.",
+      "Do keep every animation to fill and text color, and remove it under reduced motion."
+    ],
+    "donts": [
+      "Don't round a corner on a tile, panel, control, or badge.",
+      "Don't use a shadow to lift a surface. The zero-offset inset strokes are the only shadows.",
+      "Don't use a tag hue for a link, a status, an error, or a decoration.",
+      "Don't signal a failure with color. Hollow is the failure treatment.",
+      "Don't fill a band, a card, or navigation with Stable Black.",
+      "Don't set running text in Spline Sans Mono or in expanded Archivo.",
+      "Don't set text under 12px outside a chart tile."
+    ]
+  }
+}
