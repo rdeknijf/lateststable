@@ -19,7 +19,8 @@ private GitOps repo).
 
 ## Architecture
 
-- `src/index.ts` — routing, caching, CORS, homepage HTML
+- `src/index.ts` — routing, caching, CORS
+- `src/homepage.ts` — homepage HTML (`src/homepage-copy.ts` holds its text, `src/homepage-fonts.ts` its inlined fonts)
 - `src/platforms.ts` — 15 platform fetchers (pypi, npm, github, docker, jetbrains, helm, crates, go, homebrew, rubygems, nuget, packagist, aur, maven, artifacthub)
 - `src/version.ts` — parseVersion, isSemver, compareSemver
 - `src/cache.ts` — in-memory TTL cache (1 hour default)
